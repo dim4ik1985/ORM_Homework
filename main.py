@@ -2,10 +2,7 @@ import json
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from models import Publisher, Shop, Book, Stock, Sale, create_table
-
-user_name = input('Enter login : ')
-password = input('Enter password: ')
-database_name = input('Name database: ')
+from config import USER_NAME, PASSWORD, DATABASE
 
 
 def create_dsn(name, user_password, db_name, driver='postgresql'):
@@ -13,7 +10,7 @@ def create_dsn(name, user_password, db_name, driver='postgresql'):
     return DSN
 
 
-engine = sqlalchemy.create_engine(create_dsn(user_name, password, database_name))
+engine = sqlalchemy.create_engine(create_dsn(USER_NAME, PASSWORD, DATABASE))
 create_table(engine)
 
 # Сессия
@@ -44,12 +41,11 @@ init_test_data(session)
 # Поиск издателя
 def search_publisher(value):
     if value.isdigit():
-        query = session.query(Publisher).filter(Publisher.id == value)
+        for p in session.query(Publisher).filter(Publisher.id == value).all():
+            print(p)
     else:
-        query = session.query(Publisher).filter(Publisher.name == value)
-
-    for s in query.all():
-        print(f'{s.id}: {s.name}')
+        for p in session.query(Publisher).filter(Publisher.name == value).all():
+            print(p)
 
 
 search_publisher(value=input('Имя автора или его идентификатор: '))
